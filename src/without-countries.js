@@ -63,40 +63,50 @@ function DottedMapWithoutCountries({ map, avoidOuterPins = false }) {
     getPoints() {
       return Object.values(points);
     },
-    getSVG({
-      shape = 'circle',
-      color = 'current',
-      backgroundColor = 'transparent',
-      radius = 0.5,
-    }) {
-      const getPoint = ({ x, y, svgOptions = {} }) => {
-        const pointRadius = svgOptions.radius || radius;
-        if (shape === 'circle') {
-          return `<circle cx="${x}" cy="${y}" r="${pointRadius}" fill="${
-            svgOptions.color || color
-          }" />`;
-        } else if (shape === 'hexagon') {
-          const sqrt3radius = Math.sqrt(3) * pointRadius;
+getSVG({
+  shape = 'circle',
+  color = 'current',
+  backgroundColor = 'transparent',
+  radius = 0.5,
+}) {
+  const getPoint = ({ x, y, svgOptions = {} }) => {
+    const pointRadius = svgOptions.radius || radius;
+    const label = svgOptions.label || '';
 
-          const polyPoints = [
-            [x + sqrt3radius, y - pointRadius],
-            [x + sqrt3radius, y + pointRadius],
-            [x, y + 2 * pointRadius],
-            [x - sqrt3radius, y + pointRadius],
-            [x - sqrt3radius, y - pointRadius],
-            [x, y - 2 * pointRadius],
-          ];
+    let shapeElement;
 
-          return `<polyline points="${polyPoints
-            .map((point) => point.join(','))
-            .join(' ')}" fill="${svgOptions.color || color}" />`;
-        }
-      };
+    if (shape === 'circle') {
+      shapeElement = `<circle cx="${x}" cy="${y}" r="${pointRadius}" fill="${svgOptions.color || color}" />`;
+    } else if (shape === 'hexagon') {
+      const sqrt3radius = Math.sqrt(3) * pointRadius;
 
-      return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${backgroundColor}">
-        ${Object.values(points).map(getPoint).join('\n')}
-      </svg>`;
-    },
+      const polyPoints = [
+        [x + sqrt3radius, y - pointRadius],
+        [x + sqrt3radius, y + pointRadius],
+        [x, y + 2 * pointRadius],
+        [x - sqrt3radius, y + pointRadius],
+        [x - sqrt3radius, y - pointRadius],
+        [x, y - 2 * pointRadius],
+      ];
+
+      shapeElement = `<polyline points="${polyPoints
+        .map((point) => point.join(','))
+        .join(' ')}" fill="${svgOptions.color || color}" />`;
+    }
+
+    // Create the text element for the label
+    const textElement = label
+      ? `<text x="${x}" y="${y - pointRadius - 0.1}" text-anchor="middle" fill="${svgOptions.color || color}" font-size="1">${label}</text>`
+      : '';
+
+    return `${shapeElement}\n${textElement}`;
+  };
+
+  return `<svg viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg" style="background-color: ${backgroundColor}">
+    ${Object.values(points).map(getPoint).join('\n')}
+  </svg>`;
+},
+
     image: {
       region,
       width,

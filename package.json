@@ -1,5 +1,5 @@
 {
-  "name": "dotted-map",
+  "name": "@fatchan/dotted-map",
   "version": "2.2.3",
   "description": "Create a SVG map filled with dots for the world or countries",
   "main": "./index.js",
